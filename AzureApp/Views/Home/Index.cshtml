@@ -1,0 +1,113 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+@model AzureWebApp.Models.MongoDBConnectionDetails
+<link href="~/Styles/webapp.css" rel="stylesheet" />
+<div class="jumbotron">
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <h2>MongoDB Test Connection</h2>
+        <table style="width:100%">
+            <tr>
+                <td><label class="azure-web-app-label">MongoDB HostName: </label></td>
+                <td>
+                    <input type="text" name="txtHostName" id="txtHostName" class="azure-web-app-textbox" />
+                </td>
+            </tr>
+            <tr>
+                <td><label class="azure-web-app-label">MongoDB Port: </label></td>
+                <td>
+                    <input type="text" name="txtPortNumber" id="txtPortNumber" value="27017" class="azure-web-app-textbox" />
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <input type="checkbox" name="chkIsSslEnabled" id="chkIsSslEnabled" /><label class="azure-web-app-label" style="width:200px !important">Enable SSL</label>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <input type="checkbox" name="chkIsSelfSignedEnabled" id="chkIsSelfSignedEnabled" /><label class="azure-web-app-label" style="width:200px !important">AllowSelfSignedCertificate</label>
+                </td>
+            </tr>
+            <tr>
+                <td><label class="azure-web-app-label">Authentication Type: </label></td>
+                <td>
+                    <select id="drpAuthenticationType" onselect="OnAuthChange()" name="drpAuthenticationType" class="azure-web-app-dropdown">
+                        <option value="NONE">None</option>
+                        @*<option value="SCRAM">Scram</option>*@
+                        <option value="X509">X.509</option>
+                    </select>
+                </td>
+            </tr>
+            @*<tr>
+                    <td><label class="azure-web-app-label">UserName: </label></td>
+                    <td>
+                        <input type="text" name="txtUserName" id="txtUserName" class="azure-web-app-textbox" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="azure-web-app-label">Password: </label></td>
+                    <td>
+                        <input type="text" name="txtPassword" id="txtPassword" class="azure-web-app-textbox" />
+                    </td>
+                </tr>*@
+            @*<tr>
+                    <td><label class="azure-web-app-label">Authentication DataBase: </label></td>
+                    <td>
+                        <input type="text" name="txtAuthenticationDatabase" id="txtAuthenticationDatabase" class="azure-web-app-textbox" />
+                    </td>
+                </tr>*@
+            <tr>
+                <td><label class="azure-web-app-label">SSL Client certificate: </label></td>
+                <td>
+                    <input type="text" name="txtSslClientCertificate" id="txtSslClientCertificate" class="azure-web-app-textbox" />
+                    </tr>
+            <tr>
+                <td><label class="azure-web-app-label">SSL Client Password: </label></td>
+                <td>
+                    <input type="text" name="txtSslCertificatePassword" id="txtSslCertificatePassword" class="azure-web-app-textbox" />
+                </td>
+            </tr>
+            <tr>
+                <td><label class="azure-web-app-label">Databases: </label></td>
+                <td>
+                    <select id="drpDatabaseList" name="drpDatabaseList" class="azure-web-app-dropdown" />
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <input type="submit" value="Connect" onclick="Connect()" />
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script>
+    function Connect() {
+        var data = {
+            HostName: $('#txtHostName').val(),
+            Port: $('#txtPortNumber').val(),
+            IsSslEnabled: $('#chkIsSslEnabled').is(':checked'),
+            IsSelfSignedEnabled: $('#chkIsSelfSignedEnabled').is(':checked'),
+            AuthenticationMechanism: $('#drpAuthenticationType').val(),
+            UserName: $('#txtUserName').val(),
+            Password: $('#txtPassword').val(),
+            SslClientCertificate: $('#txtSslClientCertificate').val(),
+            SslCertificatePassword: $('#txtSslCertificatePassword').val(),
+            AuthenticationDatabase: $('#txtAuthenticationDatabase').val(),
+        };
+        $.post("/Home/FormOne", { mongodbConnection: data },
+            function () {
+                alert('Successfully posted to server')
+            }).done(function (formData) {
+                alert('List of Databases -------  ' + formData)
+            });
+    }
+</script>
