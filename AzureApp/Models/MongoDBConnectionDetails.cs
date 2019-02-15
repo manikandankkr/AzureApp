@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AzureApp.Helper;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
@@ -26,10 +27,7 @@ namespace AzureWebApp.Models
         public string AuthenticationDatabase { get; set; }
         public byte[] SslCertificateData
         {
-            get
-            {
-                return File.ReadAllBytes(this.SslClientCertificate);
-            }
+            get;set;
         }
     }
 

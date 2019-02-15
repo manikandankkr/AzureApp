@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using AzureApp.Helper;
+using MongoDB.Driver;
 using Syncfusion.Dashboard.Service.Base;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,45 @@ namespace AzureWebApp.Controllers
             catch(Exception e)
             {
                 return Json(string.Concat(string.IsNullOrEmpty(e.Message) ? "":e.Message,"**********",e.InnerException==null?"":e.InnerException.Message, JsonRequestBehavior.AllowGet));
+            }
+        }
+        
+        [HttpPost]
+        public string FileUpload(string filePath)
+        {
+            return FilePathHelper.WriteStreamToFile(new MemoryStream(System.IO.File.ReadAllBytes(filePath.ToString())));
+        }
+
+        [HttpPost]
+        public ActionResult UploadFiles()
+        {
+            if (Request.Files.Count > 0)
+            {
+                try
+                {  
+                    HttpFileCollectionBase files = Request.Files;
+                    string fname = DateTime.Now.ToString("yyyyMMddHHmmssffff");
+                    for (int i = 0; i < files.Count; i++)
+                    {
+                        HttpPostedFileBase file = files[i];
+                        string filename = Path.Combine(Server.MapPath("~/Files/certificates/"), fname);
+                        string directoryPath = Path.GetDirectoryName(filename);
+                        if (!Directory.Exists(directoryPath))
+                        {
+                            Directory.CreateDirectory(directoryPath);
+                        }
+                        file.SaveAs(filename);
+                    }
+                    return Json(fname);
+                }
+                catch (Exception ex)
+                {
+                    return Json("Error occurred. Error details: " + ex.Message);
+                }
+            }
+            else
+            {
+                return Json("No files selected.");
             }
         }
 
@@ -94,6 +134,7 @@ namespace AzureWebApp.Controllers
             if (connectionParameters.IsSslEnabled &&
                 !connectionParameters.AuthenticationMechanism.Equals(Models.MongoAuthentication.X509))
             {
+                connectionParameters.SslCertificateData = FilePathHelper.ReadFile(Server, connectionParameters.SslClientCertificate);
                 if (connectionParameters.SslCertificateData != null)
                 {
                     var certificate = string.IsNullOrEmpty(connectionParameters.SslCertificatePassword) ? new X509Certificate2(connectionParameters.SslCertificateData) : new X509Certificate2(connectionParameters.SslCertificateData, connectionParameters.SslCertificatePassword);
@@ -109,6 +150,7 @@ namespace AzureWebApp.Controllers
                     break;
                 case Models.MongoAuthentication.X509:
                     settings.UseSsl = true;
+                    connectionParameters.SslCertificateData = FilePathHelper.ReadFile(Server, connectionParameters.SslClientCertificate);
                     var certificate = string.IsNullOrEmpty(connectionParameters.SslCertificatePassword) ? new X509Certificate2(connectionParameters.SslCertificateData) : new X509Certificate2(connectionParameters.SslCertificateData, connectionParameters.SslCertificatePassword);
                     settings.SslSettings = new SslSettings()
                     {

@@ -64,8 +64,12 @@
             <tr>
                 <td><label class="azure-web-app-label">SSL Client certificate: </label></td>
                 <td>
-                    <input type="text" name="txtSslClientCertificate" id="txtSslClientCertificate" class="azure-web-app-textbox" />
-                    </tr>
+                        <input type="text" name="txtSslClientCertificate" id="txtSslClientCertificate" style="width:150px !important" class="azure-web-app-textbox" />
+                        @*<input type="button" value="Upload" onclick="upload()" name="SslClientCertificate" id="SslClientCertificate" />*@
+                        <input type="file" id="FileUpload1" />
+                        <input type="button" id="btnUpload" value="Upload Files"/>
+                </td>
+            </tr>
             <tr>
                 <td><label class="azure-web-app-label">SSL Client Password: </label></td>
                 <td>
@@ -89,25 +93,79 @@
 </div>
 <script src="~/Scripts/jquery-1.10.2.min.js"></script>
 <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script>
-    function Connect() {
-        var data = {
-            HostName: $('#txtHostName').val(),
-            Port: $('#txtPortNumber').val(),
-            IsSslEnabled: $('#chkIsSslEnabled').is(':checked'),
-            IsSelfSignedEnabled: $('#chkIsSelfSignedEnabled').is(':checked'),
-            AuthenticationMechanism: $('#drpAuthenticationType').val(),
-            UserName: $('#txtUserName').val(),
-            Password: $('#txtPassword').val(),
-            SslClientCertificate: $('#txtSslClientCertificate').val(),
-            SslCertificatePassword: $('#txtSslCertificatePassword').val(),
-            AuthenticationDatabase: $('#txtAuthenticationDatabase').val(),
-        };
-        $.post("/Home/FormOne", { mongodbConnection: data },
-            function () {
-                alert('Successfully posted to server')
-            }).done(function (formData) {
-                alert('List of Databases -------  ' + formData)
+    $('#btnUpload').click(function () {
+        debugger;
+        // Checking whether FormData is available in browser  
+        if (window.FormData !== undefined) {
+
+            var fileUpload = $("#FileUpload1").get(0);
+            var files = fileUpload.files;
+
+            // Create FormData object  
+            var fileData = new FormData();
+
+            // Looping over all files and add it to FormData object  
+            for (var i = 0; i < files.length; i++) {
+                fileData.append(files[i].name, files[i]);
+            }
+
+            // Adding one more key to FormData object  
+           // fileData.append('username', ‘Manas’);
+
+            $.ajax({
+                url: '/Home/UploadFiles',
+                type: "POST",
+                contentType: false, // Not to set any content header  
+                processData: false, // Not to process data  
+                data: fileData,
+                success: function (result) {
+                    $('#txtSslClientCertificate').val(result);
+                    alert(result);
+                },
+                error: function (err) {
+                    alert(err.statusText);
+                }
             });
-    }
+        } else {
+            alert("FormData is not supported.");
+        }
+    });
+
+        function Connect() {
+            var data = {
+                HostName: $('#txtHostName').val(),
+                Port: $('#txtPortNumber').val(),
+                IsSslEnabled: $('#chkIsSslEnabled').is(':checked'),
+                IsSelfSignedEnabled: $('#chkIsSelfSignedEnabled').is(':checked'),
+                AuthenticationMechanism: $('#drpAuthenticationType').val(),
+                UserName: $('#txtUserName').val(),
+                Password: $('#txtPassword').val(),
+                SslClientCertificate: $('#txtSslClientCertificate').val(),
+                SslCertificatePassword: $('#txtSslCertificatePassword').val(),
+                AuthenticationDatabase: $('#txtAuthenticationDatabase').val(),
+            };
+            $.post("/Home/FormOne", {
+                mongodbConnection: data
+            },
+                function () { }).done(function (formData) {
+                    alert('List of Databases -------  ' + formData)
+                });
+        }
+
+        function upload() {
+            debugger;
+            var data = $('#txtSslClientCertificate').val();
+
+            $.post("/Home/FileUpload", {
+                filePath: data
+            },
+                function () { }).done(function (result) {
+                    $('#txtSslClientCertificate').val(result);
+                    alert(result);
+                }).fail(function (a, b, c) {
+                    console.log(a, b, c);
+                });
+        }
 </script>
