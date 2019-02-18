@@ -44,30 +44,30 @@
                 </td>
             </tr>
             @*<tr>
-                    <td><label class="azure-web-app-label">UserName: </label></td>
-                    <td>
-                        <input type="text" name="txtUserName" id="txtUserName" class="azure-web-app-textbox" />
-                    </td>
-                </tr>
-                <tr>
-                    <td><label class="azure-web-app-label">Password: </label></td>
-                    <td>
-                        <input type="text" name="txtPassword" id="txtPassword" class="azure-web-app-textbox" />
-                    </td>
-                </tr>*@
+                <td><label class="azure-web-app-label">UserName: </label></td>
+                <td>
+                    <input type="text" name="txtUserName" id="txtUserName" class="azure-web-app-textbox" />
+                </td>
+            </tr>
+            <tr>
+                <td><label class="azure-web-app-label">Password: </label></td>
+                <td>
+                    <input type="text" name="txtPassword" id="txtPassword" class="azure-web-app-textbox" />
+                </td>
+            </tr>*@
             @*<tr>
-                    <td><label class="azure-web-app-label">Authentication DataBase: </label></td>
-                    <td>
-                        <input type="text" name="txtAuthenticationDatabase" id="txtAuthenticationDatabase" class="azure-web-app-textbox" />
-                    </td>
-                </tr>*@
+                <td><label class="azure-web-app-label">Authentication DataBase: </label></td>
+                <td>
+                    <input type="text" name="txtAuthenticationDatabase" id="txtAuthenticationDatabase" class="azure-web-app-textbox" />
+                </td>
+            </tr>*@
             <tr>
                 <td><label class="azure-web-app-label">SSL Client certificate: </label></td>
                 <td>
-                        <input type="text" name="txtSslClientCertificate" id="txtSslClientCertificate" style="width:150px !important" class="azure-web-app-textbox" />
-                        @*<input type="button" value="Upload" onclick="upload()" name="SslClientCertificate" id="SslClientCertificate" />*@
-                        <input type="file" id="FileUpload1" />
-                        <input type="button" id="btnUpload" value="Upload Files"/>
+                    <input type="text" name="txtSslClientCertificate" id="txtSslClientCertificate" style="width:150px !important" class="azure-web-app-textbox" />
+                    @*<input type="button" value="Upload" onclick="upload()" name="SslClientCertificate" id="SslClientCertificate" />*@
+                    <input type="file" id="FileUpload1" />
+                    <input type="button" id="btnUpload" value="Upload Files" />
                 </td>
             </tr>
             <tr>
@@ -77,9 +77,9 @@
                 </td>
             </tr>
             <tr>
-                <td><label class="azure-web-app-label">Databases: </label></td>
+                <td><label class="azure-web-app-label">Logs: </label></td>
                 <td>
-                    <select id="drpDatabaseList" name="drpDatabaseList" class="azure-web-app-dropdown" />
+                    <input type="text" value="@ViewBag.SslMessage" id="drpDatabaseList" name="drpDatabaseList" class="azure-web-app-dropdown" />
                 </td>
             </tr>
             <tr>

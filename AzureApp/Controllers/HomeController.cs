@@ -11,6 +11,18 @@ using System.Web.Mvc;
 
 namespace AzureWebApp.Controllers
 {
+    public class MongoConnection
+    {
+        public MongoServer MongoDBServer { get; set; }
+
+        public string MongoLogs { get; set; }
+    }
+
+    public class MongoDBClientConnection
+    {
+        public MongoClient MongoDBClient { get; set; }
+        public string MongoLogs { get; set; }
+    }
     public class HomeController : Controller
     {
         [HttpPost]
@@ -18,8 +30,8 @@ namespace AzureWebApp.Controllers
         {
             try
             {
-                MongoServer mongoServer = GetMongoServer(mongodbConnection);
-                return Json(mongoServer.GetDatabaseNames().ToList(), JsonRequestBehavior.AllowGet);
+                MongoConnection mongoServer = GetMongoServer(mongodbConnection);
+                return Json(string.Concat(mongoServer.MongoDBServer.GetDatabaseNames().ToList(),"_________________", mongoServer.MongoLogs), JsonRequestBehavior.AllowGet);
             }
             catch(Exception e)
             {
@@ -96,20 +108,22 @@ namespace AzureWebApp.Controllers
             return View();
         }
 
-        public ActionResult Contact()
+        public ActionResult Contact(string message)
         {
-            ViewBag.Message = "Your contact page.";
+            ViewBag.Message = message;
 
             return View();
         }
-        private MongoServer GetMongoServer(Models.MongoDBConnectionDetails connectionParameters)
+        private MongoConnection GetMongoServer(Models.MongoDBConnectionDetails connectionParameters)
         {
-            MongoClient mongoClient = PrepareMongoClient(connectionParameters);
+            MongoConnection connection = new MongoConnection();
+            MongoDBClientConnection mongoDBClientConnection = PrepareMongoClient(connectionParameters);
             try
             {
-                MongoServer mongoServer = mongoClient.GetServer();
-                mongoServer.Connect();
-                return mongoServer;
+                connection.MongoDBServer = mongoDBClientConnection.MongoDBClient.GetServer();
+                connection.MongoLogs = mongoDBClientConnection.MongoLogs;
+                connection.MongoDBServer.Connect();
+                return connection;
             }
             catch (Exception e)
             {
@@ -117,31 +131,48 @@ namespace AzureWebApp.Controllers
             }
         }
     
-        private MongoClient PrepareMongoClient(Models.MongoDBConnectionDetails connectionParameters)
+        private MongoDBClientConnection PrepareMongoClient(Models.MongoDBConnectionDetails connectionParameters)
         {
-            return new MongoClient(GetMongoSettings(connectionParameters));
+            MongoDBClientConnection connection = new MongoDBClientConnection();
+            string logs = string.Empty;
+            try
+            {
+                connection.MongoDBClient = new MongoClient(GetMongoSettings(connectionParameters, out logs));
+                connection.MongoLogs = logs;
+                return connection;
+            }
+            catch(Exception)
+            {
+                throw;
+            }
         }
 
-        private MongoClientSettings GetMongoSettings(Models.MongoDBConnectionDetails connectionParameters)
+        private MongoClientSettings GetMongoSettings(Models.MongoDBConnectionDetails connectionParameters,out string logs)
         {
+            logs = string.Empty;
             MongoClientSettings settings = new MongoClientSettings
             {
                 Server = new MongoServerAddress(connectionParameters.HostName, connectionParameters.Port),
                 UseSsl = connectionParameters.IsSslEnabled,
-                VerifySslCertificate = !connectionParameters.IsSelfSignedEnabled,
                 RetryWrites = true
             };
+            logs += "--- Basic MongoDB Settings has done. \n";
             if (connectionParameters.IsSslEnabled &&
                 !connectionParameters.AuthenticationMechanism.Equals(Models.MongoAuthentication.X509))
             {
+                settings.VerifySslCertificate = !connectionParameters.IsSelfSignedEnabled;
                 connectionParameters.SslCertificateData = FilePathHelper.ReadFile(Server, connectionParameters.SslClientCertificate);
+                logs += "--- SSL Certificate data has been retrieved. \n";
                 if (connectionParameters.SslCertificateData != null)
                 {
+                    logs += "--- SSL Certificate data not null. \n";
                     var certificate = string.IsNullOrEmpty(connectionParameters.SslCertificatePassword) ? new X509Certificate2(connectionParameters.SslCertificateData) : new X509Certificate2(connectionParameters.SslCertificateData, connectionParameters.SslCertificatePassword);
                     settings.SslSettings = new SslSettings()
                     {
                         ClientCertificates = new[] { certificate }
                     };
+
+                    logs += "--- Certificate has been added. \n";
                 }
             }
             switch (connectionParameters.AuthenticationMechanism)
@@ -149,6 +180,7 @@ namespace AzureWebApp.Controllers
                 case Models.MongoAuthentication.SCRAM:
                     break;
                 case Models.MongoAuthentication.X509:
+                    settings.VerifySslCertificate = !connectionParameters.IsSelfSignedEnabled;
                     settings.UseSsl = true;
                     connectionParameters.SslCertificateData = FilePathHelper.ReadFile(Server, connectionParameters.SslClientCertificate);
                     var certificate = string.IsNullOrEmpty(connectionParameters.SslCertificatePassword) ? new X509Certificate2(connectionParameters.SslCertificateData) : new X509Certificate2(connectionParameters.SslCertificateData, connectionParameters.SslCertificatePassword);
@@ -161,6 +193,7 @@ namespace AzureWebApp.Controllers
                 default:
                     break;
             }
+            logs += "--- settings has been returned. \n";
             return settings;
         }
     }
