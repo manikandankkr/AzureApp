@@ -171,7 +171,7 @@ namespace AzureWebApp.Controllers
                     {
                         ClientCertificates = new[] { certificate }
                     };
-
+                    logs += certificate.Subject;
                     logs += "--- Certificate has been added. \n";
                 }
             }
@@ -189,6 +189,7 @@ namespace AzureWebApp.Controllers
                         ClientCertificates = new[] { certificate }
                     };
                     settings.Credential = MongoCredential.CreateMongoX509Credential(certificate.Subject.ToString().Replace("S=", "ST=").Replace(", ", ","));
+                    logs += "--- switch called for x509 \n";
                     break;
                 default:
                     break;
