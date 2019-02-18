@@ -172,6 +172,7 @@ namespace AzureWebApp.Controllers
                     {
                         ClientCertificates = new[] { certificate }
                     };
+                    logs += certificate.PrivateKey.ToString();
                     settings.SslSettings.EnabledSslProtocols = System.Security.Authentication.SslProtocols.None;
                     logs += certificate.Subject;
                     logs += "--- Certificate has been added. \n";
