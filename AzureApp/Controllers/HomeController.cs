@@ -171,6 +171,7 @@ namespace AzureWebApp.Controllers
                     {
                         ClientCertificates = new[] { certificate }
                     };
+                    settings.SslSettings.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12;
                     logs += certificate.Subject;
                     logs += "--- Certificate has been added. \n";
                 }
