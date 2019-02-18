@@ -127,7 +127,7 @@ namespace AzureWebApp.Controllers
             }
             catch (Exception e)
             {
-                throw e;
+                throw new Exception(mongoDBClientConnection.MongoLogs,e);
             }
         }
     
@@ -141,9 +141,9 @@ namespace AzureWebApp.Controllers
                 connection.MongoLogs = logs;
                 return connection;
             }
-            catch(Exception)
+            catch(Exception ex)
             {
-                throw;
+                throw new Exception(logs,ex);
             }
         }
 
