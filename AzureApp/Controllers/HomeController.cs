@@ -122,7 +122,6 @@ namespace AzureWebApp.Controllers
             {
                 connection.MongoDBServer = mongoDBClientConnection.MongoDBClient.GetServer();
                 connection.MongoLogs = mongoDBClientConnection.MongoLogs;
-                connection.MongoDBServer.Ping();
                 connection.MongoDBServer.Connect();
                 return connection;
             }
@@ -172,7 +171,6 @@ namespace AzureWebApp.Controllers
                     {
                         ClientCertificates = new[] { certificate }
                     };
-                    logs += certificate.PrivateKey.ToString();
                     logs += certificate.Subject;
                     logs += "--- Certificate has been added. \n";
                 }
