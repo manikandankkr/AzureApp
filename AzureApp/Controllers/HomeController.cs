@@ -161,17 +161,19 @@ namespace AzureWebApp.Controllers
                 !connectionParameters.AuthenticationMechanism.Equals(Models.MongoAuthentication.X509))
             {
                 settings.VerifySslCertificate = !connectionParameters.IsSelfSignedEnabled;
-                //connectionParameters.SslCertificateData = FilePathHelper.ReadFile(Server, connectionParameters.SslClientCertificate);
-                string certificateData = FilePathHelper.ReadAsFile(Server, connectionParameters.SslClientCertificate);
+                connectionParameters.SslCertificateData = FilePathHelper.ReadFile(Server, connectionParameters.SslClientCertificate);
                 logs += "--- SSL Certificate data has been retrieved. \n";
-                logs += "--- SSL Certificate data not null. \n";
-                var certificate = string.IsNullOrEmpty(connectionParameters.SslCertificatePassword) ? new X509Certificate2(certificateData) : new X509Certificate2(certificateData, connectionParameters.SslCertificatePassword);
-                settings.SslSettings = new SslSettings()
+                if (connectionParameters.SslCertificateData != null)
                 {
-                    ClientCertificates = new[] { certificate }
-                };
-                logs += certificate.Subject;
-                logs += "--- Certificate has been added. \n";
+                    logs += "--- SSL Certificate data not null. \n";
+                    var certificate = string.IsNullOrEmpty(connectionParameters.SslCertificatePassword) ? new X509Certificate2(connectionParameters.SslCertificateData) : new X509Certificate2(connectionParameters.SslCertificateData, connectionParameters.SslCertificatePassword);
+                    settings.SslSettings = new SslSettings()
+                    {
+                        ClientCertificates = new[] { certificate }
+                    };
+                    logs += certificate.Subject;
+                    logs += "--- Certificate has been added. \n";
+                }
             }
             switch (connectionParameters.AuthenticationMechanism)
             {
@@ -180,9 +182,8 @@ namespace AzureWebApp.Controllers
                 case Models.MongoAuthentication.X509:
                     settings.VerifySslCertificate = !connectionParameters.IsSelfSignedEnabled;
                     settings.UseSsl = true;
-                    string certificateData = FilePathHelper.ReadAsFile(Server, connectionParameters.SslClientCertificate);
-                    //connectionParameters.SslCertificateData = FilePathHelper.ReadFile(Server, connectionParameters.SslClientCertificate);
-                    var certificate = string.IsNullOrEmpty(connectionParameters.SslCertificatePassword) ? new X509Certificate2(certificateData) : new X509Certificate2(certificateData, connectionParameters.SslCertificatePassword);
+                    connectionParameters.SslCertificateData = FilePathHelper.ReadFile(Server, connectionParameters.SslClientCertificate);
+                    var certificate = string.IsNullOrEmpty(connectionParameters.SslCertificatePassword) ? new X509Certificate2(connectionParameters.SslCertificateData) : new X509Certificate2(connectionParameters.SslCertificateData, connectionParameters.SslCertificatePassword);
                     settings.SslSettings = new SslSettings()
                     {
                         ClientCertificates = new[] { certificate }
