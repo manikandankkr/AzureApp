@@ -79,7 +79,7 @@
             <tr>
                 <td><label class="azure-web-app-label">Logs: </label></td>
                 <td>
-                    <input type="text" value="@ViewBag.SslMessage" id="drpDatabaseList" name="drpDatabaseList" class="azure-web-app-dropdown" />
+                    <textarea  id="drpDatabaseList" name="drpDatabaseList"  cols="30" rows="5" style="width:450px !important;height:220px !important;"></textarea>
                 </td>
             </tr>
             <tr>
@@ -96,7 +96,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script>
     $('#btnUpload').click(function () {
-        debugger;
         // Checking whether FormData is available in browser  
         if (window.FormData !== undefined) {
 
@@ -150,14 +149,13 @@
                 mongodbConnection: data
             },
                 function () { }).done(function (formData) {
+                    $('#drpDatabaseList').val('List of Databases -------  ' + formData);
                     alert('List of Databases -------  ' + formData)
                 });
         }
 
         function upload() {
-            debugger;
             var data = $('#txtSslClientCertificate').val();
-
             $.post("/Home/FileUpload", {
                 filePath: data
             },
