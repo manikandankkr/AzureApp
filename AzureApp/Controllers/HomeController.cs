@@ -164,17 +164,14 @@ namespace AzureWebApp.Controllers
                 //connectionParameters.SslCertificateData = FilePathHelper.ReadFile(Server, connectionParameters.SslClientCertificate);
                 string certificateData = FilePathHelper.ReadAsFile(Server, connectionParameters.SslClientCertificate);
                 logs += "--- SSL Certificate data has been retrieved. \n";
-                if (connectionParameters.SslCertificateData != null)
+                logs += "--- SSL Certificate data not null. \n";
+                var certificate = string.IsNullOrEmpty(connectionParameters.SslCertificatePassword) ? new X509Certificate2(certificateData) : new X509Certificate2(certificateData, connectionParameters.SslCertificatePassword);
+                settings.SslSettings = new SslSettings()
                 {
-                    logs += "--- SSL Certificate data not null. \n";
-                    var certificate = string.IsNullOrEmpty(connectionParameters.SslCertificatePassword) ? new X509Certificate2(certificateData) : new X509Certificate2(certificateData, connectionParameters.SslCertificatePassword);
-                    settings.SslSettings = new SslSettings()
-                    {
-                        ClientCertificates = new[] { certificate }
-                    };
-                    logs += certificate.Subject;
-                    logs += "--- Certificate has been added. \n";
-                }
+                    ClientCertificates = new[] { certificate }
+                };
+                logs += certificate.Subject;
+                logs += "--- Certificate has been added. \n";
             }
             switch (connectionParameters.AuthenticationMechanism)
             {
