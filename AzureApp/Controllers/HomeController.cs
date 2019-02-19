@@ -161,12 +161,13 @@ namespace AzureWebApp.Controllers
                 !connectionParameters.AuthenticationMechanism.Equals(Models.MongoAuthentication.X509))
             {
                 settings.VerifySslCertificate = !connectionParameters.IsSelfSignedEnabled;
-                connectionParameters.SslCertificateData = FilePathHelper.ReadFile(Server, connectionParameters.SslClientCertificate);
+                //connectionParameters.SslCertificateData = FilePathHelper.ReadFile(Server, connectionParameters.SslClientCertificate);
+                string certificateData = FilePathHelper.ReadAsFile(Server, connectionParameters.SslClientCertificate);
                 logs += "--- SSL Certificate data has been retrieved. \n";
                 if (connectionParameters.SslCertificateData != null)
                 {
                     logs += "--- SSL Certificate data not null. \n";
-                    var certificate = string.IsNullOrEmpty(connectionParameters.SslCertificatePassword) ? new X509Certificate2(connectionParameters.SslCertificateData) : new X509Certificate2(connectionParameters.SslCertificateData, connectionParameters.SslCertificatePassword);
+                    var certificate = string.IsNullOrEmpty(connectionParameters.SslCertificatePassword) ? new X509Certificate2(certificateData) : new X509Certificate2(certificateData, connectionParameters.SslCertificatePassword);
                     settings.SslSettings = new SslSettings()
                     {
                         ClientCertificates = new[] { certificate }
@@ -182,8 +183,9 @@ namespace AzureWebApp.Controllers
                 case Models.MongoAuthentication.X509:
                     settings.VerifySslCertificate = !connectionParameters.IsSelfSignedEnabled;
                     settings.UseSsl = true;
-                    connectionParameters.SslCertificateData = FilePathHelper.ReadFile(Server, connectionParameters.SslClientCertificate);
-                    var certificate = string.IsNullOrEmpty(connectionParameters.SslCertificatePassword) ? new X509Certificate2(connectionParameters.SslCertificateData) : new X509Certificate2(connectionParameters.SslCertificateData, connectionParameters.SslCertificatePassword);
+                    string certificateData = FilePathHelper.ReadAsFile(Server, connectionParameters.SslClientCertificate);
+                    //connectionParameters.SslCertificateData = FilePathHelper.ReadFile(Server, connectionParameters.SslClientCertificate);
+                    var certificate = string.IsNullOrEmpty(connectionParameters.SslCertificatePassword) ? new X509Certificate2(certificateData) : new X509Certificate2(certificateData, connectionParameters.SslCertificatePassword);
                     settings.SslSettings = new SslSettings()
                     {
                         ClientCertificates = new[] { certificate }
