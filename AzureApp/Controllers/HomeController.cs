@@ -166,7 +166,9 @@ namespace AzureWebApp.Controllers
                 if (connectionParameters.SslCertificateData != null)
                 {
                     logs += "--- SSL Certificate data not null. \n";
+                    logs += "----CertificateData. \n" + System.Text.Encoding.UTF8.GetString(connectionParameters.SslCertificateData);
                     var certificate = string.IsNullOrEmpty(connectionParameters.SslCertificatePassword) ? new X509Certificate2(connectionParameters.SslCertificateData) : new X509Certificate2(connectionParameters.SslCertificateData, connectionParameters.SslCertificatePassword);
+                    logs += "----CertificateAdded. \n";
                     settings.SslSettings = new SslSettings()
                     {
                         ClientCertificates = new[] { certificate }
